@@ -313,3 +313,66 @@
     draw(0);
   });
 })();
+
+/* ---------- 全屏点缀星空（铺满整页黑色区域） ---------- */
+(function () {
+  "use strict";
+  var canvas = document.getElementById("bgStars");
+  if (!canvas) return;
+  var ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  var stars = [];
+  var raf = null;
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function makeStars() {
+    var w = canvas.width / (window.devicePixelRatio || 1);
+    var h = canvas.height / (window.devicePixelRatio || 1);
+    var count = Math.max(60, Math.min(320, Math.floor((w * h) / 4200)));
+    stars = [];
+    for (var i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 0.4 + Math.random() * 1.5,
+        base: 0.25 + Math.random() * 0.75,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.5 + Math.random() * 1.6
+      });
+    }
+  }
+
+  function resize() {
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(window.innerWidth * dpr));
+    canvas.height = Math.max(1, Math.round(window.innerHeight * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    makeStars();
+  }
+
+  function draw(t) {
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    ctx.clearRect(0, 0, w, h);
+    var time = t || 0;
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      var a = reduced ? s.base : s.base * (0.5 + 0.5 * Math.sin((time / 1000) * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255," + Math.max(0.05, Math.min(1, a)).toFixed(3) + ")";
+      ctx.fill();
+    }
+  }
+
+  function loop(t) { draw(t); raf = requestAnimationFrame(loop); }
+
+  resize();
+  draw(0);
+  if (!reduced) raf = requestAnimationFrame(loop);
+  window.addEventListener("resize", function () {
+    resize();
+    draw(0);
+  });
+})();
