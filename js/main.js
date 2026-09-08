@@ -246,3 +246,70 @@
     });
   }
 })();
+
+/* ---------- 深空星空背景（Planet 主题） ---------- */
+(function () {
+  "use strict";
+  var canvas = document.getElementById("starfield");
+  if (!canvas) return;
+  var hero = document.getElementById("home");
+  if (!hero) return;
+  var ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  var stars = [];
+  var raf = null;
+  var reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  function makeStars() {
+    var w = canvas.width / (window.devicePixelRatio || 1);
+    var h = canvas.height / (window.devicePixelRatio || 1);
+    var target = Math.floor((w * h) / 6500);
+    var count = Math.max(40, Math.min(260, target));
+    stars = [];
+    for (var i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        r: 0.4 + Math.random() * 1.3,
+        base: 0.25 + Math.random() * 0.75,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.6 + Math.random() * 1.8
+      });
+    }
+  }
+
+  function resize() {
+    var rect = hero.getBoundingClientRect();
+    var dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(rect.width * dpr));
+    canvas.height = Math.max(1, Math.round(rect.height * dpr));
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    makeStars();
+  }
+
+  function draw(t) {
+    var w = canvas.width / (window.devicePixelRatio || 1);
+    var h = canvas.height / (window.devicePixelRatio || 1);
+    ctx.clearRect(0, 0, w, h);
+    var time = t || 0;
+    for (var i = 0; i < stars.length; i++) {
+      var s = stars[i];
+      var a = reduced ? s.base : s.base * (0.45 + 0.55 * Math.sin((time / 1000) * s.speed + s.phase));
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255," + Math.max(0, Math.min(1, a)).toFixed(3) + ")";
+      ctx.fill();
+    }
+  }
+
+  function loop(t) { draw(t); raf = requestAnimationFrame(loop); }
+
+  resize();
+  draw(0);
+  if (!reduced) raf = requestAnimationFrame(loop);
+  window.addEventListener("resize", function () {
+    resize();
+    draw(0);
+  });
+})();
