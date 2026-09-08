@@ -880,3 +880,27 @@ body {
   background-size: 100% 100%, 100% 100%, 100% 100%;
 }
 .site-footer { background: rgba(5,8,22,.6); }
+
+/* ========== 品牌名「源」字放大突出 ========== */
+.brand-name {
+  display: inline-flex;
+  align-items: baseline;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+.brand-mark {
+  font-style: normal;
+  font-weight: 800;
+  font-size: 1.55em;
+  line-height: 1;
+  margin-right: 3px;
+  background: linear-gradient(120deg, #e0e7ff, #fff 70%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 6px rgba(165,180,252,.45));
+}
+@media (max-width: 640px) {
+  .brand-name { font-size: 1.2rem; }
+  .brand-mark { font-size: 1.5em; }
+}
